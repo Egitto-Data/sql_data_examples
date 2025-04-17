@@ -182,6 +182,39 @@ FROM(
 		FROM Sales.Products)T
 WHERE Distrank <=0.4
 
+----------------------------------------------------------------------------------------------------------
+--Analze the month-over-month (MoM) performance by finding the percentage change between the current and previous month 
+SELECT
+		*,
+		CurrentMonth-PreviousMonthSales AS MoM_Change,
+		CONCAT(ROUND(CAST((CurrentMonth-PreviousMonthSales)AS FLOAT)/PreviousMonthSales * 100,2),'%')  AS PercentageSales
+		
+FROM    (SELECT
+        
+		MONTH(OrderDate) OrderMonth,
+		SUM(Sales) CurrentMonth,
+		LAG(SUM(Sales)) OVER (ORDER BY MONTH(OrderDate)) PreviousMonthSales
+		FROM Sales.Orders
+		GROUP BY MONTH(OrderDate) 
+		)T
+-----------------------------------------------------------------------------------------------------------------------------------
+--In order to analyze customer loyalty ,
+--rank customer based on the average days between their orders 
+SELECT
+     CustomerID,
+	 AVG(DaystoNextOrdr) AvgDays,
+	 RANK() OVER (ORDER BY COALESCE(AVG(DaystoNextOrdr),10000000)) RankAvg
+
+FROM     (SELECT
+			OrderID,
+			CustomerID,
+			OrderDate AS CurrentOrder,
+			LEAD(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate) NextOrder,
+			DATEDIFF(day,OrderDate,LEAD(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate)) DaystoNextOrdr
+	      FROM Sales.Orders
+	     )T
+GROUP BY CustomerID
+
 
 
 
