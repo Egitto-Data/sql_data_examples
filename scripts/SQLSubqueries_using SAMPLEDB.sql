@@ -1,5 +1,6 @@
 --Using the SAMPLEDB return all the following:
 --return the following product details for the cheapest product in the oes.products table:
+
 USE SAMPLEDB
 GO
 
@@ -11,8 +12,8 @@ SELECT
 FROM oes.products
 WHERE list_price = (
                      SELECT
-					 MIN(list_price)
-					 FROM oes.products
+	                   MIN(list_price)
+			   FROM oes.products
 					);
 --Another solution 
 SELECT 
@@ -35,10 +36,10 @@ SELECT
 FROM oes.products p
 WHERE p.list_price = ( 
                       SELECT
-					        MIN(p2.list_price)
-					  FROM oes.products p2
-					  WHERE P2.category_id = p.category_id
-					  );
+			  MIN(p2.list_price)
+			  FROM oes.products p2
+			  WHERE P2.category_id = p.category_id
+			  );
 
 --Return product details for the cheapest product in each product category by using join to a derived table
 
@@ -50,11 +51,11 @@ SELECT
 FROM oes.products p
 INNER JOIN 
            (SELECT
-		          category_id,
-				  MIN(list_price) AS Min_list_Price
-				  FROM oes.products
-				  GROUP BY category_id
-				  ) p2
+		  category_id,
+			  MIN(list_price) AS Min_list_Price
+			  FROM oes.products
+			  GROUP BY category_id
+			  ) p2
 ON p.category_id = p2.category_id
 AND p.list_price =P2.Min_list_Price;
 
@@ -81,6 +82,7 @@ AND p.list_price = P2.Min_list_Price;
 
 --Return product details for the cheapest product in each product category by using Commen table expression 
 --Including the category name
+
 WITH Cheapest_Product_By_Category AS
 (
 SELECT
@@ -112,9 +114,9 @@ SELECT
 FROM hcm.employees
 WHERE employee_id NOT IN (
                            SELECT
-						   employee_id
-						   FROM oes.orders
-						   WHERE employee_id IS NOT NULL
+				   employee_id
+				   FROM oes.orders
+				   WHERE employee_id IS NOT NULL
                                 );
 --Another solution using NOT EXISTS operator
 
@@ -126,7 +128,7 @@ FROM hcm.employees e
 WHERE  NOT EXISTS (
                     SELECT 1
 	                FROM oes.orders o
-					WHERE o.employee_id = e.employee_id
+			WHERE o.employee_id = e.employee_id
                         );
 
 --Return unique customers who have ordered the 'PBX Smart Watch 4'
@@ -138,11 +140,11 @@ SELECT
 FROM oes.customers c
 WHERE c.customer_id IN (
                         SELECT
-						      o.customer_id
-						FROM oes.orders o
-						JOIN oes.order_items oi
-						ON oi.order_id = o.order_id
-						JOIN oes.products p
-						ON p.product_id = oi.product_id
-						WHERE p.product_name = 'PBX Smart Watch 4'
+				o.customer_id
+				FROM oes.orders o
+				JOIN oes.order_items oi
+				ON oi.order_id = o.order_id
+				JOIN oes.products p
+				ON p.product_id = oi.product_id
+				WHERE p.product_name = 'PBX Smart Watch 4'
                         )
